@@ -19,18 +19,22 @@ def login() :
     message = ''
     if request.method == 'POST' :
         if request.form['submitButton'] == 'login' :
-            password = request.form['password']
-            email = request.form['email']
-            if email and password :
+            inputPassword = request.form['password']
+            emailOrUsername = request.form['emailOrUsername']
+            if emailOrUsername and inputPassword :
                 cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-                cursor.execute('SELECT * FROM CUSTOMER WHERE Username = %s', (email,))
+                cursor.execute('SELECT * FROM CUSTOMER WHERE Username = %s OR email = %s', (emailOrUsername, emailOrUsername))
                 account = cursor.fetchone()
                 if account :
-                    session['LoggedIn'] = True
-                    session['ID'] = account['ID']
-                    session['username'] = account['Username']
-                    session['name'] = account['First_Name']
-                    return redirect(url_for('homepage'))
+                    accountPassword = account['Password']
+                    if (inputPassword == accountPassword) :
+                        session['LoggedIn'] = True
+                        session['ID'] = account['ID']
+                        session['username'] = account['Username']
+                        session['name'] = account['First_Name']
+                        return redirect(url_for('homepage'))
+                    else : 
+                        message = "INVALID PASSWORD"
                 if not account : 
                     message = "INVALID USERNAME OR PASSWORD" 
         if request.form['submitButton'] == 'register' : 
@@ -49,7 +53,6 @@ def register() :
         streetName = request.form['streetname']
         streetNumber = request.form['streetnumber']
         zipcode = request.form['zipcode']
-        zipcode = int(zipcode)
         city = request.form['city']
         state = request.form['state']
         phoneNumber = request.form['phonenumber']

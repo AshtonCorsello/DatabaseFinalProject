@@ -92,7 +92,7 @@ def homepage() :
     if loggedIn : 
         return render_template('homepage.html', name = session['name'])
     else : 
-        return redirect(url_for('/'))
+        return redirect(url_for('/')) 
     
 
 
